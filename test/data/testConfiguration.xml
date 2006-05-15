@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<Configuration xmlns="." xmlns:xsi="." xsi:schemaLocation= "." name="CMSConfiguration" version="0">
+
+<Include>
+  <File name="Geometry/CMSCommonData/data/materials.xml"            url="."/>
+  <File name="Geometry/HcalCommonData/data/hcalrotations.xml"       url="."/>
+  <File name="SimG4CMS/HcalTestBeam/test/data/TBHcal.xml"           url="."/>
+  <File name="Geometry/HcalTestBeamData/data/TBHcal04BeamLine.xml"  url="."/>
+  <File name="Geometry/HcalTestBeamData/data/TBHcalXtal.xml"        url="."/>
+  <File name="Geometry/HcalTestBeamData/data/TBHcalCable.xml"       url="."/>
+  <File name="Geometry/HcalTestBeamData/data/TBHcalBarrel.xml"      url="."/>
+  <File name="Geometry/HcalTestBeamData/data/TBHcalEndcap.xml"      url="."/>
+  <File name="Geometry/HcalTestBeamData/data/TBHcal04HcalOuter.xml" url="."/>
+  <File name="Geometry/HcalTestBeamData/data/TBHcal04Sens.xml"      url="."/>
+  <File name="Geometry/HcalTestBeamData/data/TBHcal04Util.xml"      url="."/>
+  <File name="Geometry/HcalTestBeamData/data/TBHcal04ProdCuts.xml"  url="."/>
+</Include>
+ <Root fileName="TBHcal.xml" logicalPartName="TBHCal"/>
+</Configuration>
