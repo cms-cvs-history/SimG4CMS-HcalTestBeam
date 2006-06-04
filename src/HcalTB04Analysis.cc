@@ -1,22 +1,7 @@
-// -*- C++ -*-
-//
-// Package:     HcalTestBeam
-// Class  :     HcalTB04Analysis
-//
-// Implementation:
-//     Main analysis class for Hcal Test Beam 2004 Analysis
-//
-// Original Author:
-//         Created:  Tue May 16 10:14:34 CEST 2006
-// $Id$
-//
-  
-// system include files
-#include <cmath>
-#include <iostream>
-#include <iomanip>
-
-// user include files
+///////////////////////////////////////////////////////////////////////////////
+// File: HcalTB04Analysis.cc
+// Description: Main analysis class for Hcal Test Beam 2004 Analysis
+///////////////////////////////////////////////////////////////////////////////
 #include "SimG4CMS/HcalTestBeam/interface/HcalTB04Analysis.h"
 
 #include "SimG4Core/Notification/interface/BeginOfRun.h"
@@ -43,13 +28,11 @@
 #include "G4HCofThisEvent.hh"
 #include "CLHEP/Units/SystemOfUnits.h"
 #include "CLHEP/Units/PhysicalConstants.h"
+#include <cmath>
+#include <iostream>
+#include <iomanip>
 
-//
-// constructors and destructor
-//
-
-HcalTB04Analysis::HcalTB04Analysis(const edm::ParameterSet &p): myQie(0),
-								histo(0) {
+HcalTB04Analysis::HcalTB04Analysis(const edm::ParameterSet &p): myQie(0) {
 
   edm::ParameterSet m_Anal = p.getParameter<edm::ParameterSet>("HcalTB04Analysis");
   hcalOnly       = m_Anal.getParameter<bool>("HcalOnly");
@@ -60,12 +43,11 @@ HcalTB04Analysis::HcalTB04Analysis(const edm::ParameterSet &p): myQie(0),
   scaleHB16      = m_Anal.getParameter<double>("ScaleHB16");
   scaleHO        = m_Anal.getParameter<double>("ScaleHO");
   scaleHE0       = m_Anal.getParameter<double>("ScaleHE0");
-  names          = m_Anal.getParameter<std::vector<std::string> >("Names");
-  beamOffset     =-m_Anal.getUntrackedParameter<double>("BeamPosition",0.0)*mm;
-  double fMinEta = m_Anal.getUntrackedParameter<double>("MinEta",-5.5);
-  double fMaxEta = m_Anal.getUntrackedParameter<double>("MaxEta",5.5);
-  double fMinPhi = m_Anal.getUntrackedParameter<double>("MinPhi",-3.14159265358979323846);
-  double fMaxPhi = m_Anal.getUntrackedParameter<double>("MaxPhi", 3.14159265358979323846);
+  beamOffset     =-m_Anal.getParameter<double>("BeamPosition")*mm;
+  double fMinEta = m_Anal.getParameter<double>("MinEta");
+  double fMaxEta = m_Anal.getParameter<double>("MaxEta");
+  double fMinPhi = m_Anal.getParameter<double>("MinPhi");
+  double fMaxPhi = m_Anal.getParameter<double>("MaxPhi");
   double beamEta = (fMaxEta+fMinEta)/2.;
   double beamPhi = (fMaxPhi+fMinPhi)/2.;
   double beamThet= 2*atan(exp(-beamEta));
@@ -73,6 +55,7 @@ HcalTB04Analysis::HcalTB04Analysis(const edm::ParameterSet &p): myQie(0),
   iceta          = (int)(beamEta/0.087) + 1;
   icphi          = (int)(abs(beamPhi)/0.087) + 5;
   if (icphi > 72) icphi -= 73;
+  names          = m_Anal.getParameter<std::vector<std::string> >("Names");
 
   produces<PHcalTB04Info>();
 
@@ -94,32 +77,25 @@ HcalTB04Analysis::HcalTB04Analysis(const edm::ParameterSet &p): myQie(0),
   init();
 
   myQie  = new HcalQie(p);
-  histo  = new HcalTB04Histo(m_Anal);
 } 
    
 HcalTB04Analysis::~HcalTB04Analysis() {
 
   edm::LogInfo("HcalTBSim") << "\n -------->  Total number of selected entries"
-			    << " : " << count << "\nPointers:: QIE " << myQie
-			    << " Histo " << histo;
+			    << " : " << count << "\nPointers:: QIE " << myQie;
   if (myQie)   {
     delete myQie;
     myQie  = 0;
   }
-  if (histo)   {
-    delete histo;
-    histo  = 0;
-  }
 }
-
-//
-// member functions
-//
 
 void HcalTB04Analysis::produce(edm::Event& e, const edm::EventSetup&) {
 
+  std::cout << "Enter  HcalTB04Analysis::produce " << std::endl;
   std::auto_ptr<PHcalTB04Info> product(new PHcalTB04Info);
-  fillEvent(*product);
+  std::cout << "Create PHcalTB04Info " << std::endl;
+  finalAnalysis(*product);
+  std::cout << "Return from finalAnalysis " << std::endl;
   e.put(product);
 }
 
@@ -156,25 +132,6 @@ void HcalTB04Analysis::init() {
       LogDebug("HcalTBSim") << "\tCrystal[" << i << "] Original " << std::hex
 			    << idEcal[i] << " Stored " << idXtal[i] <<std::dec;
     }
-  }
-  // Profile vectors
-  eseta.reserve(5);
-  eqeta.reserve(5); 
-  esphi.reserve(3);
-  eqphi.reserve(3);
-  eslay.reserve(20);
-  eqlay.reserve(20);
-  for (int i=0; i<5; i++) {
-    eseta.push_back(0.);
-    eqeta.push_back(0.);
-  }
-  for (int i=0; i<3; i++) {
-    esphi.push_back(0.);
-    eqphi.push_back(0.);
-  }
-  for (int i=0; i<20; i++) {
-    eslay.push_back(0.);
-    eqlay.push_back(0.);
   }
 
   // counter 
@@ -373,10 +330,6 @@ void HcalTB04Analysis::update(const EndOfEvent * evt) {
 			  << ecalHitCache.size() << " hits";
     xtalAnalysis();
   }
-  
-  //Final Analysis
-  LogDebug("HcalTBSim") << "HcalTB04Analysis::Final analysis";  
-  finalAnalysis();
 
   int iEvt = (*evt)()->GetEventID();
   if (iEvt < 10) 
@@ -756,13 +709,21 @@ void HcalTB04Analysis::xtalAnalysis() {
   }
 }
 
-void HcalTB04Analysis::finalAnalysis() {
+void HcalTB04Analysis::finalAnalysis(PHcalTB04Info& product) {
+
+  //Setup the ID's
+  product.setIDs(idHcal, idXtal);
 
   //Beam Information
-  histo->fillPrimary(pInit, etaInit, phiInit);
+  product.setPrimary(nPrimary, particleType, pInit, etaInit, phiInit);
+
+  //Energy deposits in the crystals and towers
+  product.setEdepHcal(esimh, eqie);
+  product.setEdepHcal(esime, enois);
 
   // Total Energy
-  eecals = ehcals = eecalq = ehcalq = 0.;
+  double etots, eecals=0., ehcals=0.;
+  double etotq, eecalq=0., ehcalq=0.;
   for (int i=0; i<nTower; i++) {
     ehcals += esimh[i];
     ehcalq += eqie[i];
@@ -778,17 +739,10 @@ void HcalTB04Analysis::finalAnalysis() {
 			<< " (HCal) " << ehcals << "\nHcalTB04Analysis:: "
 			<< "Energy deposit at Qie Level (Total) " << etotq
 			<< " (ECal) " << eecalq << " (HCal) " << ehcalq;
-  histo->fillEdep(etots, eecals, ehcals, etotq, eecalq, ehcalq);
+  product.setEdep(etots, eecals, ehcals, etotq, eecalq, ehcalq);
 
   // Lateral Profile
-  for (int i=0; i<5; i++) {
-    eseta[i] = 0.;
-    eqeta[i] = 0.;
-  }
-  for (int i=0; i<3; i++) {
-    esphi[i] = 0.;
-    eqphi[i] = 0.;
-  }
+  std::vector<double> eseta(5,0), eqeta(5,0), esphi(3,0), eqphi(3,0);
   double e1=0, e2=0;
   unsigned int id;
   for (int i=0; i<nTower; i++) {
@@ -825,13 +779,10 @@ void HcalTB04Analysis::finalAnalysis() {
     LogDebug("HcalTBSim") << "HcalTB04Analysis:: [" << i << "] Eta Sim = "
 			  << eseta[i] << " Qie = " << eqeta[i] << " Phi Sim = "
 			  << esphi[i] << " Qie = " << eqphi[i];
-  histo->fillTrnsProf(eseta,eqeta,esphi,eqphi);
+  product.setTrnsProf(eseta,eqeta,esphi,eqphi);
 
   // Longitudianl profile
-  for (int i=0; i<20; i++) {
-    eslay[i] = 0.;
-    eqlay[i] = 0.;
-  }
+  std::vector<double> eslay(20,0), eqlay(20,0);
   e1=0; e2=0;
   for (int i=0; i<nTower; i++) {
     int det, z, group, ieta, iphi, layer;
@@ -854,29 +805,6 @@ void HcalTB04Analysis::finalAnalysis() {
   for (int i=0; i<20; i++)
     LogDebug("HcalTBSim") << "HcalTB04Analysis:: [" << i << "] Sim = " 
 			  << eslay[i] << " Qie = " << eqlay[i];
-  histo->fillLongProf(eslay, eqlay);
-}
-
-
-void HcalTB04Analysis::fillEvent (PHcalTB04Info& product) {
-
-  //Setup the ID's
-  product.setIDs(idHcal, idXtal);
-
-  //Beam Information
-  product.setPrimary(nPrimary, particleType, pInit, etaInit, phiInit);
-
-  //Energy deposits in the crystals and towers
-  product.setEdepHcal(esimh, eqie);
-  product.setEdepHcal(esime, enois);
-
-  // Total Energy
-  product.setEdep(etots, eecals, ehcals, etotq, eecalq, ehcalq);
-
-  // Lateral Profile
-  product.setTrnsProf(eseta,eqeta,esphi,eqphi);
-
-  // Longitudianl profile
   product.setLongProf(eslay, eqlay);
 
   //Save Hits
