@@ -3,7 +3,7 @@ es_source = XMLIdealGeometryESSource {
 		"Geometry/CMSCommonData/data/materials.xml",
 		"Geometry/CMSCommonData/data/rotations.xml",
 		"Geometry/HcalCommonData/data/hcalrotations.xml",
-		"Geometry/HcalTestBeamData/data/TBHcal.xml",     
+		"SimG4CMS/HcalTestBeam/test/data/TBHcal.xml",     
 		"Geometry/HcalTestBeamData/data/TBHcal06BeamLine.xml",
 		"Geometry/HcalTestBeamData/data/TBHcal06Ecal.xml",
 		"Geometry/HcalTestBeamData/data/TBHcalCable.xml",
