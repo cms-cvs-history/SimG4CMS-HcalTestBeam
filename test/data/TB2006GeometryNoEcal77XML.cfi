@@ -1,0 +1,17 @@
+es_source = XMLIdealGeometryESSource {
+ 	vstring geomXMLFiles = {
+		"Geometry/CMSCommonData/data/materials.xml",
+		"Geometry/CMSCommonData/data/rotations.xml",
+		"Geometry/HcalCommonData/data/hcalrotations.xml",
+		"SimG4CMS/HcalTestBeam/test/77/TBHcal.xml",     
+		"Geometry/HcalTestBeamData/data/TBHcal06BeamLine.xml",
+		"Geometry/HcalTestBeamData/data/TBHcalCable.xml",
+		"Geometry/HcalTestBeamData/data/TBHcalBarrel.xml",
+		"Geometry/HcalTestBeamData/data/TBHcalEndcap.xml",
+		"Geometry/HcalTestBeamData/data/TBHcal06HcalOuter.xml",
+		"Geometry/HcalTestBeamData/data/TBHcal06Sens.xml",
+		"Geometry/HcalTestBeamData/data/TBHcal06ProdCuts.xml",
+		"Geometry/HcalTestBeamData/data/TBHcal06Util.xml"     
+	}
+	string rootNodeName = "TBHcal:TBHCal"
+}
